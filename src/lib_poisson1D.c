@@ -8,27 +8,41 @@
 void set_GB_operator_rowMajor_poisson1D(double* AB, int *lab, int *la)
 {
 
-  //TODO
-}
+  //int ii, jj, kk;
+  for (int i=0; i< *la ; i++)
+  {
+    AB[i]=0.0;
+    AB[i+*la]=-1.0;
+    AB[i + (*la)*2]=2.0;
+    AB[i+(*la)*3]=-1.0;
+  }
+  AB[(*lab)*(*la)-1]=0.0;
+  AB[*la]=0.0;
 
-//genere matrice tridiagonal
-void set_GB_operator_colMajor_poisson1D(double* AB, int *lab, int *la, int *kv){
+
+ }
+
+
+void set_GB_operator_colMajor_poisson1D(double* AB, int *lab, int *la, int *kv)
+{
   int ii, jj, kk;
   for (jj=0;jj<(*la);jj++) // pour toute les colonnes
   {
     kk = jj*(*lab);
     if (*kv>=0)
     {
-      for (ii=0;ii< *kv;ii++)
+      for (ii=0;ii < *kv;ii++)
       {
 	       AB[kk+ii]=0.0;
       }
+
     }
    AB[kk+ *kv]=-1.0;
    AB[kk+ *kv+1]=2.0;
    AB[kk+ *kv+2]=-1.0;
   }
-  AB[0]=0.0;
+
+  AB[0]=0.0;    // taille sur et sous diag = n-1
   if (*kv == 1) {AB[1]=0;}
 
   AB[(*lab)*(*la)-1]=0.0;
@@ -97,16 +111,16 @@ void write_GB_operator_rowMajor_poisson1D(double* AB, int* lab, int* la, char* f
   }
 }
 
-void write_GB_operator_colMajor_poisson1D(double* AB, int* lab, int* la, char* filename)
-{
+
+void write_GB_operator_colMajor_poisson1D(double* AB, int* lab, int* la, char* filename){
   FILE * file;
   int ii,jj;
   file = fopen(filename, "w");
   //Numbering from 1 to la
   if (file != NULL){
-    for (ii=0;ii<(la);ii++){
-      for (jj=0;jj<(lab);jj++){
-    fprintf(file,"%lf\t",AB[ii(lab)+jj]);
+    for (ii=0;ii<(*la);ii++){
+      for (jj=0;jj<(*lab);jj++){
+        fprintf(file,"%lf\t",AB[ii*(*lab)+jj]);
       }
       fprintf(file,"\n");
     }
@@ -116,7 +130,6 @@ void write_GB_operator_colMajor_poisson1D(double* AB, int* lab, int* la, char* f
     perror(filename);
   }
 }
-
 void write_vec(double* vec, int* la, char* filename){
   int jj;
   FILE * file;
@@ -124,7 +137,7 @@ void write_vec(double* vec, int* la, char* filename){
   // Numbering from 1 to la
   if (file != NULL){
     for (jj=0;jj<(*la);jj++){
-      fprintf(file,"%lf\n",vec[jj]);
+      fprintf(file,"%.15f\n",vec[jj]);
     }
     fclose(file);
   }
@@ -172,6 +185,8 @@ double eigmin_poisson1D(int *la){
   eigmin=4*eigmin*eigmin;
   return eigmin;
 }
+
+
 
 double richardson_alpha_opt(int *la){
   //TODO
