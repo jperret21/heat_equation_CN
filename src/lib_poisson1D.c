@@ -19,8 +19,8 @@ void set_GB_operator_rowMajor_poisson1D(double* AB, int *lab, int *la)
   AB[(*lab)*(*la)-1]=0.0;
   AB[*la]=0.0;
 
-
  }
+
 
 
 void set_GB_operator_colMajor_poisson1D(double* AB, int *lab, int *la, int *kv)
@@ -186,7 +186,32 @@ double eigmin_poisson1D(int *la){
   return eigmin;
 }
 
+void fct_Col(double* CB ,int* lab, int* la)
+{
+  for (int i=1; i<(*la)-1; i++)
+  {
+    CB[i*(*lab-1)]=-1.0;
+    CB[i*(*lab-1) + 1]=2.0;
+    CB[i*(*lab-1) + 2]=-1.0;
+  }
+  CB[1]=2.0;
+  CB[2]=-1.0;
+  CB[(*lab-1)*(*la) - 3] = -1.0;
+  CB[(*lab-1)*(*la) - 2] = 2.0;
+}
 
+void fct_Row(double* DB ,int* lab, int* la)
+{
+  for (int i=1; i<(*la); i++){
+    DB[i]=-1.0;
+  }
+  for (int i=0; i<(*la); i++){
+    DB[i + (*la)]=2.0;
+  }
+  for (int i=0; i<(*la)-1; i++){
+    DB[i + (*la)*2]=-1.0;
+  }
+}
 
 double richardson_alpha_opt(int *la){
   //TODO
