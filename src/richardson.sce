@@ -12,36 +12,61 @@ function [x,relres,resvec,it]= richardson(A,b,tol,max_it,x0,alpha)
     it=0
     x=0
     res=b-A*x0
-    relres=norm(b-A*x0)/norm(b)
+    relres=norm(res)/norm(b)
     
     
-    while( (relres>tol) & (it< max_it) )
+    while( (relres > tol) & (it< max_it) )
         it=it+1
-        x=x0+ alpha*res //daxpy
+       
+        x= x0+ alpha * res //daxpy
         res=b-A*x0      //gaxpy
-        relres=norm(b-A*x0)/norm(b)
+        relres=norm(res)/norm(b)
         resvec(it)=relres
         x0=x
+        
     end
-    
-    
 endfunction
 
-//-------------------------------|| TEST ||-----------------------------------//
-n=5
-tol=0,00000001
-A=Create_Mdiag(-1,2-1,n)
-b=rand(n,1)
-max_it=10000
-x_0=ones(n,1)
-alpha=1/2
-[x,relres,resvec,it]=richardson(A,b,tol,max_it,x_0,alpha)
+function [res]= richardson(A,b,epsilon,n,alpha)
+    D=diag(diag(A))
+    x=zeros(n,1)
+    r=[]
+    cpt=1
+    
+    while (norm(b-A*x) > epsilon)
+        x=x+alpha*(b-A*x)
+        r(cpt)=norm(b-A*x) //residu
+        cpt=cpt+1
+    end
+    
+    res=r
+endfunction
 
-for i= 1:1:4
-    alpha=A/i
-    [x,relres,resvec,it]=richardson(A,b,tol,max_it,x_0,alpha)
-    plot(1:1:it,resvec)
+
+//-------------------------------|| TEST ||-----------------------------------//
+n=50
+tol=10^(-8)
+
+A=Create_Mdiag(-1,2,-1,n)
+
+
+b=rand(n,1)
+
+max_it=100000
+x_0=zeros(n,1)
+
+
+for i= 2:1:8
+    alpha=1/i
+    richard=log10(richardson(A,b,tol,n,alpha))
+    
+    s1=size(richard,1) // Jacobi
+    r_richard=1:1:s1
+    plot2d(r_richard,richard,style = i)
 
 end
 
 
+xlabel("nb iteration");
+ylabel("log10(erreur residuelle)");
+hl=legend(['i=2';'i=3';'i=4';'i=5';'i=6';'i=7';])
